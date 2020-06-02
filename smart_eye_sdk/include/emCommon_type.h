@@ -4,17 +4,12 @@
 //------------------------------------------------------------------------------
 //  操作系统平台定义
 //------------------------------------------------------------------------------
-
 #include <stddef.h>
 #ifdef WIN32
     #ifndef _WIN32
         #define _WIN32
     #endif
 #endif
-
-// #ifdef _WIN64
-//     #define _CRT_SECURE_NO_WARNINGS
-// #endif
 
 #ifdef _WIN32
 	#include <windows.h>
@@ -68,10 +63,6 @@
 	#define CALLSPEC
 #endif
 
-#include <iostream>
-#include <vector>
-#include <string.h>
-#include <memory.h>
 //////////////////////////////////////////////////////////////////////////
 //  类型定义，以下类型都在标准C库头文件stdint.h中有定义，但是在微软的编译平台
 //  VS2010之前的版本中都不包含此文件,所以在此需要重定义
@@ -103,22 +94,35 @@
     #include <stdint.h>
 #endif
 
+//------------------------------------------------------------------------------
+//  算法模式定义 单目多曝光或者双目单曝光算法
+//------------------------------------------------------------------------------
+//#define XILINX_ZYNQMP_MONOCULAR_ALGRITHIM   1
+
+/************************************************************************************/
+/************************************************************************************/
+//public header files
+#include <iostream>
+#include <vector>
+#include <string.h>
+#include <memory.h>
+
 #define SETALIGN	sizeof(int)
 
-#ifndef _WIN32
-	#ifdef __GNUC__
-	#define GNUC_ALIGN(n) __attribute__((aligned(n)))
-	#endif
-#else
+#ifdef _WIN32
 	#define GNUC_ALIGN(n)
+#else
+	#ifdef __GNUC__
+		#define GNUC_ALIGN(n) __attribute__((aligned(n)))
+	#endif
 #endif
 
 #ifdef _WIN32
-using namespace std;
+	using namespace std;
 #endif
 
-/**************************************************************/
-/**************************************************************/
+/***********************************************************************************/
+/***********************************************************************************/
 #define    EF(errflags)     errflags
 #define    EG(errsuggest)   errsuggest
 #define    POPULATEERRORINDICATIONS(errno, errflags, errsuggest) \
@@ -131,9 +135,10 @@ using namespace std;
         }while(0)
 
 #define POEI(errno, errflags, errsuggest)   POPULATEERRORINDICATIONS(errno, errflags, errsuggest)
-/*********************************
+
+/*************************************************************************************
  * cmd
- * *******************************************/
+ * ***********************************************************************************/
  //pcl
 #define GUI_CMD_CONTROL_SET_PARALLAX_ON     "SetOutputParallaxOn" //设置输出计算结果类型 [cmdx]x:0 视差 x:1 点云
 
@@ -192,6 +197,7 @@ using namespace std;
 
 #define GUI_CMD_CONTROL_GET_SYSINFO						"GetSysInfo"	//获取系统信息
 #define GUI_CMD_CONTROL_SET_ROI_PERPOTIES               "SetRoiPerpoties"   //set roi value
+#define GUI_CMD_CONTROL_SET_Z_AXIS                      "SetZaxisValue" //pointcloud' z-axis value
 
 #define GUI_CMD_CONTROL_TO_2DCAMERA_MODE 				"CmdProCamerLookMode" //进入2D模式
 #define GUI_CMD_CONTROL_TO_NORMAL_MODE         			"CmdRunNormalMode"//进入正常模式
@@ -199,9 +205,10 @@ using namespace std;
 
 #define GUI_CMD_CONTROL_EXIT							"CmdExitApp"	//退出APP
 #define GUI_CMD_CONTROL_TCP_TEST                        "TCP"
-/*********************************
+
+/****************************************************************************************
  * OTHER DEFINE
- * *******************************************/
+ * **************************************************************************************/
 #define MAX_MSG_LEN                                     2048
 #define MSQ_KEY                                         1005
 
@@ -214,8 +221,9 @@ using namespace std;
 #define NUM_NETWOR_COMMAND_FIELDS                       6
 
 #define SocketAddressSize  sizeof(struct sockaddr_in)
-#define PACAGESIZE (1400)
- //--------------------data-struct------------------------------
+#define PACAGESIZE (4096)
+
+//--------------------data-struct------------------------------
 //------------------------------------------------------------------------------
 //  错误码定义
 //------------------------------------------------------------------------------
@@ -392,7 +400,8 @@ struct pak_header
     int        arg2 ;         //当前被赋值为当前数据包在整个数据包中的index的ASCII码，用于抓包查看
     int        m ;            // 当前帧数据最后一包标识位，用于检测数据是否为最后一包
     int        type;          //标识数据种类 0:左相机图像 1:右相机图像 2:标定结果图像 3:FPGA计算结果图像
-    int        recv;          //保留
+    int        recv1;          //保留
+    int        recv2;         //保留
 }GNUC_ALIGN(SETALIGN);
 typedef struct pak_header	 pak_header;
 

@@ -104,16 +104,27 @@ public:
     emSMARTEYE_API int emOpenDevice(EM_DEV_HANDLE& hDevice, int nDeviceIndex, int msg_id, bool quickRun = false, bool isPointCloud = false);
 
     /**
-    * @brief Close Device
-    * @param  nDeviceIndex
-    *   device index the same index with ip_index in emGuiDevScanInfo[],begin with  0:,when more then one device,1 index is sencod device
-    *   and so on.this param is can be used for operation opened device.
-    *
+    * @brief Set ROI area
+    * @param  nDeviceIndex from 0
+    *           startX from 1
+    *           startY from 1
+    *           width
+    *           height
     * @retval -1: fail
     * @retval  0: succeed
     */
-    //emSMARTEYE_API int emSetRoiValue(const int nDeviceIndex, const int rowLeftValue, const int rowRightValue, const int colLeftValue, const int colRightValue);
     emSMARTEYE_API int emSetRoiValue(const int nDeviceIndex, const int startX, const int startY, const int width, const int height);
+
+    /**
+    * @brief Set ROI z-axis value
+    * @param  nDeviceIndex from 0
+    *           zMin from 1
+    *           zMax from 1
+    * @retval -1: fail
+    * @retval  0: succeed
+    */
+    emSMARTEYE_API int emSetzAxisValueOfPiontcloud(const int nDeviceIndex, const int zMin, const int zMax);
+
     /**
     * @brief Close Device
     * @param  nDeviceIndex
@@ -381,6 +392,7 @@ public:
     */
     emSMARTEYE_API int emExchangeParallaxToPointCloud(uint8_t* parallexBuf, uint8_t *grayImg, PointCloud_EM_Ptr& pointCloud);
     emSMARTEYE_API int emExchangeParallaxToPointCloudEx(uint8_t* parallexBuf, uint8_t *grayImg, PointCloud_EM_Ptr& pointCloud);
+    emSMARTEYE_API int emExchangeParallaxToPointCloudMonocular(uint8_t* parallexBuf, uint8_t *grayImg, PointCloud_EM_Ptr& pointCloud);
 private:
 
     void timeoutOperation();

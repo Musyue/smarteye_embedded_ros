@@ -53,11 +53,15 @@ void viewerOneOff(pcl::visualization::PCLVisualizer& viewer)
 
 int main(int argc, char **argv)
 {
-    ros::init (argc, argv, "pcl_read");
+    ros::init (argc, argv, "smart_eye_ros_node");
 
     ros::NodeHandle nh;
-    ros::Publisher pcl_pub = nh.advertise<sensor_msgs::PointCloud2> ("smarteye_output", 1000);
+    ros::Publisher pcl_pub = nh.advertise<sensor_msgs::PointCloud2> ("smarteye_output", 1);
     sensor_msgs::PointCloud2 output;
+    int open_camera_flag=0;
+    std::string smarteye_frame_id;
+    std::string save_pcd_name;
+    int save_to_pcd_flag=0;
     // test for single capturing
     emController *emDemo = new emController();
     
@@ -74,32 +78,86 @@ int main(int argc, char **argv)
         if(EM_STATUS_SUCCESS == emDemo->emOpenDevice(m_Device_1, 0, MSQ_KEY, true, false))
         {
     		emDemo->emRegisterImageCallback(0, (void*)NULL, OnTestCallBackFun);
-    		printf("10 seconds imaging testing, more than 20 times can be used normally,less than 20 please contact:*****\n");
+    		ROS_INFO("10 seconds imaging testing, more than 20 times can be used normally,less than 20 please contact:*****\n");
     		emDemo->emSetOutputOnceOrMulti(0, 0);
     		ros::Rate loop_rate(1);
             // while(1)
             while (ros::ok())
             {
-                emDemo->emDevStart(0);
-                // usleep(1000*1000);
-		        cloud->clear();
-		        emDemo->emExchangeParallaxToPointCloudEx(ImgBuffer, ImgBufferGray, emCloud);
-		        convert2PCLPointCloud(emCloud, cloud);
-                pcl::toROSMsg(*cloud, output);
-                output.header.frame_id = "smarteye_odom";
-			    // viewers.showCloud(cloud);
-                pcl_pub.publish(output);
+                if(ros::param::has("/smarteye_ros_demo/open_camera_flag"))
+                {
+
+                    ros::param::get("/smarteye_ros_demo/open_camera_flag",open_camera_flag);
+                }else
+                {
+                    ROS_ERROR("No open_camera_flag parameter,Please check your Launch file\n");
+                }
+                if(ros::param::has("/smarteye_ros_demo/save_to_pcd_flag"))
+                {
+
+                    ros::param::get("/smarteye_ros_demo/save_to_pcd_flag",save_to_pcd_flag);
+                }else
+                {
+                    ROS_ERROR("No save_to_pcd_flag parameter,Please check your Launch file\n");
+                }
+                if(ros::param::has("/smarteye_ros_demo/save_pcd_name"))
+                {
+
+                    ros::param::get("/smarteye_ros_demo/save_pcd_name",save_pcd_name);
+                }else
+                {
+                    ROS_ERROR("No save_pcd_name parameter,Please check your Launch file\n");
+                }
+                if(open_camera_flag==1)
+                {
+                    emDemo->emDevStart(0);
+                    usleep(1000*1000);
+                    cloud->clear();
+                    emDemo->emExchangeParallaxToPointCloudEx(ImgBuffer, ImgBufferGray, emCloud);
+                    convert2PCLPointCloud(emCloud, cloud);
+                    pcl::toROSMsg(*cloud, output);
+                    if(save_to_pcd_flag)
+                    {
+                        ROS_INFO("Start Save\n");
+                        pcl::io::savePCDFileASCII(save_pcd_name,*cloud);
+                        // sleep(30);
+                        // ros::param::set("/smarteye_ros_demo/save_to_pcd_flag",0);
+                        ROS_INFO("End Save\n");
+                    }
+                    
+                    if(ros::param::has("/smarteye_ros_demo/smarteye_frame_id"))
+                    {
+                        ros::param::get("/smarteye_ros_demo/smarteye_frame_id",smarteye_frame_id);
+                        output.header.frame_id = smarteye_frame_id;
+                    }else
+                    {
+                        output.header.frame_id = "smarteye_odom";
+                    }
+                    
+                    // viewers.showCloud(cloud);
+                    pcl_pub.publish(output);
+                    emDemo->emDevStop(0);
+                    ros::param::set("/smarteye_ros_demo/open_camera_flag",0);
+                }else
+                {
+                    ROS_INFO("Please Wait the open parameter!\n");
+                }
+                
+
+
+                
+
                 ros::spinOnce();
                 loop_rate.sleep();	
-			    emDemo->emDevStop(0);
+			    
 			}
             //while (!viewers.wasStopped()) {}	
         }
         else
-            printf("Open failed!\n");
+            ROS_ERROR("Open failed!\n");
     }
     else
-        printf("Scan failed!\n");
+        ROS_ERROR("Scan failed!\n");
 
     getchar();
     return 0;

@@ -12,7 +12,7 @@
 #include <pcl/common/common.h>
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/visualization/cloud_viewer.h>
-#include <pcl/io/pcd_io.h>
+
 #define IMG_WIDTH   2048
 #define IMG_HEIGHT  1536
 #define IMG_CH      4
@@ -33,10 +33,9 @@ void OnTestCallBackFun(PNP_FRAME_CALLBACK_PARAM* pFrame)
     if(recvBufID_Old != recvBufID)
     {
         recvBufID_Old = pFrame->nFrameID;
-        // printf("recv ok. %ld\n", recvBufID_Old);
+        printf("recv ok. %ld\n", recvBufID_Old);
         ///////////////////////////////////////////
         //ADD YOUR TODO CODE
-        printf("recv ok----. %d, %ld\n", recvBufID, recvBufID_Old);
       memcpy(ImgBuffer,(unsigned char*)pFrame->pImgBuf,pFrame->pBufferSize);
     }
 }
@@ -58,7 +57,6 @@ int main()
     emCloud->height = IMG_HEIGHT;
     emCloud->width = IMG_WIDTH;
     emCloud->resize(IMG_HEIGHT * IMG_WIDTH);
-    int flag=1;
     
     
     if (emDemo->emScanDevice(true) > EM_STATUS_SUCCESS) 
@@ -69,23 +67,16 @@ int main()
     		printf("10 seconds imaging testing, more than 20 times can be used normally,less than 20 please contact:*****\n");
     		emDemo->emSetOutputOnceOrMulti(0, 0);
     		
-            while(flag)
+            while(1)
             {
                 emDemo->emDevStart(0);
-                usleep(500*1000);
+                usleep(1000*1000);
 		        cloud->clear();
 		        emDemo->emExchangeParallaxToPointCloudEx(ImgBuffer, ImgBufferGray, emCloud);
 		        convert2PCLPointCloud(emCloud, cloud);
-                // pcl::io::savePCDFileASCII("./test.pcd",*cloud);
 			    viewers.showCloud(cloud);	
 			    emDemo->emDevStop(0);
-                //flag=0;
 			}
-            // while (1)
-            // {
-            //     /* code */
-            // }
-            
             //while (!viewers.wasStopped()) {}	
         }
         else
