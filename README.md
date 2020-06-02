@@ -19,8 +19,8 @@ First,you need send save parameter and then send open camera to get one frame. P
 
 `
 rosparam set /smarteye_ros_demo/save_to_pcd_flag  1
-
-
+`
+`
 rosparam set /smarteye_ros_demo/open_camera_flag 1
 `
 
