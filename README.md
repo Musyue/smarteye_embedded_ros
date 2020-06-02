@@ -8,6 +8,7 @@ roslaunch smarteye_embedded_ros smarteye_demo.launch
 ### Take a frame
 
 You can use rosparam to send open flag to take a frame,or you can send the parameter from code or ternimator.
+
 `
 rosparam set /smarteye_ros_demo/open_camera_flag 1
 `
@@ -18,6 +19,8 @@ First,you need send save parameter and then send open camera to get one frame. P
 
 `
 rosparam set /smarteye_ros_demo/save_to_pcd_flag  1
+
+
 rosparam set /smarteye_ros_demo/open_camera_flag 1
 `
 
