@@ -17,6 +17,7 @@ vim如何调整Linux操作系统socket缓冲区大小
 执行如下命令以文本方式打开“sysctl.conf”文件。
 # vi sysctl.conf
 
+
 在“sysctl.conf”文件中修改或者增加（如果不存在则增加）如下内容：
 net.core.rmem_default = 8388608
 net.core.rmem_max = 16777216
@@ -45,4 +46,6 @@ net.ipv4.tcp_max_syn_backlog=819200
 net.unix.max_dgram_qlen = 30000
 执行如下命令使以上参数生效。
 # /sbin/sysctl -p
+Fixed Ip,You need to do this
+sudo route add -net 239.255.255.250 netmask 255.255.255.255 enx000ec6c301db
 

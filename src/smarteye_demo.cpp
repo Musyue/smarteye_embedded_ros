@@ -72,14 +72,16 @@ int main()
             while(flag)
             {
                 emDemo->emDevStart(0);
-                usleep(500*1000);
+                usleep(1000*1000);
 		        cloud->clear();
 		        emDemo->emExchangeParallaxToPointCloudEx(ImgBuffer, ImgBufferGray, emCloud);
 		        convert2PCLPointCloud(emCloud, cloud);
-                // pcl::io::savePCDFileASCII("./test.pcd",*cloud);
+                printf("start save\n");
+                pcl::io::savePCDFileASCII("/data/ros/pcd_test.pcd",*cloud);
+                printf("end save\n");
 			    viewers.showCloud(cloud);	
 			    emDemo->emDevStop(0);
-                //flag=0;
+                flag=0;
 			}
             // while (1)
             // {

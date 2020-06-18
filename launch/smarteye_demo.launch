@@ -8,7 +8,7 @@
   <param name="open_camera_flag" type="int" value="0"/>
   <param name="save_to_pcd_flag" type="int" value="0"/>
   <param name="smarteye_frame_id" type="string" value="smarteye_odom"/>
-  <param name="save_pcd_name" type="string" value="/data/ros/yue_ws_2020/pcd_test.pcd"/>
+  <param name="save_pcd_name" type="string" value="/data/ros/pcd_test.pcd"/>
   </node>
 
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(find smarteye_embedded_ros)/rviz/smart_eye.rviz"/>
